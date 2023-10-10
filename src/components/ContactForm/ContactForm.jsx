@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import FillAlert from './FillAlert';
 import { ButtonClose } from './FillAlert.styled';
 import PropTypes from 'prop-types';
@@ -7,87 +7,88 @@ import { Input, Label, Button, Form, Title } from '../App.styled';
 import { nanoid } from 'nanoid';
 import { ReactComponent as CloseIcon } from '../../icons/close.svg';
 
-class ContactForm extends Component {
-  state = {
-    name: '',
-    number: '',
-    disabled: true,
-  };
+function ContactForm({ onClose, onSubmit }) {
+  const [name, setName] = useState('');
+  const [number, setNumber] = useState('');
 
-  handleInputChange = e => {
+  const handleInputChange = e => {
     const name = e.target.name;
-    this.setState({ [name]: e.currentTarget.value });
+    console.log(name);
+    switch (name) {
+      case 'name':
+        setName(e.target.value);
+        break;
+      case 'number':
+        setNumber(e.target.value);
+        break;
+      default:
+        return;
+    }
   };
-  handlerClickAdd = event => {
+  const handlerClickAdd = event => {
     event.preventDefault();
 
-    if (!this.state.name || !this.state.number) {
-      this.setState({ name: '' });
+    if (!name || !number) {
       return;
     }
 
     const newContact = {
-      name: this.state.name,
-      number: this.state.number,
+      name: name,
+      number: number,
       id: nanoid(),
     };
 
-    this.props.onSubmit(newContact);
+    onSubmit(newContact);
 
-    this.setState(prevState => ({
-      name: '',
-      number: '',
-      disabled: true,
-    }));
+    setName('');
+    setNumber('');
   };
 
-  render() {
-    return (
-      <>
-        <Title style={{ paddingLeft: '50px', marginBottom: '0' }}>
-          Add a new contact
-        </Title>
-        <Form>
-          <Label>
-            Name
-            <Input
-              value={this.state.name}
-              type="text"
-              name="name"
-              pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
-              title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-              onChange={this.handleInputChange}
-              required
-            />
-          </Label>
-          <Label>
-            Number
-            <Input
-              type="tel"
-              onChange={this.handleInputChange}
-              value={this.state.number}
-              name="number"
-              pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
-              title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
-              required
-            />
-          </Label>
-          {!this.state.name || !this.state.number ? <FillAlert /> : null}
-          <Button
-            type="submit"
-            onClick={this.handlerClickAdd}
-            disabled={!this.state.name || !this.state.number}
-            aria-label="Add a contact"
-          >
-            Add
-          </Button>
-          <ButtonClose aria-label="icon close" onClick={this.props.onClose}>
-            <CloseIcon width="10px" height="10px" />
-          </ButtonClose>
-        </Form>
-      </>
-    );
-  }
+  return (
+    <>
+      <Title style={{ paddingLeft: '50px', marginBottom: '0' }}>
+        Add a new contact
+      </Title>
+      <Form>
+        <Label>
+          Name
+          <Input
+            value={name}
+            type="text"
+            name="name"
+            pattern="^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$"
+            title="Name may contain only letters, apostrophe, dash and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
+            onChange={handleInputChange}
+            required
+          />
+        </Label>
+        <Label>
+          Number
+          <Input
+            type="tel"
+            onChange={handleInputChange}
+            value={number}
+            name="number"
+            pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
+            title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
+            required
+          />
+        </Label>
+        {!name || !number ? <FillAlert /> : null}
+        <Button
+          type="submit"
+          onClick={handlerClickAdd}
+          disabled={!name || !number}
+          aria-label="Add a contact"
+        >
+          Add
+        </Button>
+        <ButtonClose aria-label="icon close" onClick={onClose}>
+          <CloseIcon width="10px" height="10px" />
+        </ButtonClose>
+      </Form>
+    </>
+  );
 }
 
 export default ContactForm;
